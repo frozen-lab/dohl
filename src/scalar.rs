@@ -53,3 +53,14 @@ pub(crate) fn wyhash(buf: &[u8]) -> u64 {
 
     wymix(a ^ WYP[2], b ^ acc)
 }
+
+#[test]
+fn wyhash_deterministic() {
+    let data = b"caracal";
+
+    let h1 = wyhash(data);
+    let h2 = wyhash(data);
+
+    println!("deterministic hash: {h1:016x}");
+    assert_eq!(h1, h2, "wyhash must be deterministic for identical input");
+}
