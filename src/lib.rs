@@ -1,14 +1,11 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use scalar::wyhash;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+mod scalar;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+pub struct Caracal;
+
+impl Caracal {
+    pub fn hash64(buf: &[u8]) -> u64 {
+        wyhash(buf)
     }
 }

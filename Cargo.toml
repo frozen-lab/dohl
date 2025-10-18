@@ -14,7 +14,6 @@ exclude = ["flake.nix", "flake.lock"]
 lto = "fat"
 codegen-units = 1
 opt-level = "z"
-panic = "abort"
 strip = "symbols"
 
 [profile.profile]
