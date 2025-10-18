@@ -1,28 +1,27 @@
 use caracal::Caracal;
+use std::hint::black_box;
 use std::time::Instant;
 
 fn main() {
-    let data = b"caracal";
-    let iterations = 10_000_000;
+    const ITERATIONS: usize = 10_000_000;
 
-    // Warm-up
-    let _ = Caracal::hash64(data);
+    let mut acc = 0u64;
+    let mut buf = [0u8; 8];
 
     let start = Instant::now();
-    let mut acc = 0u64;
 
-    for _ in 0..iterations {
-        acc ^= Caracal::hash64(data);
+    for i in 0..ITERATIONS {
+        buf[..8].copy_from_slice(&i.to_le_bytes());
+        acc ^= black_box(Caracal::hash64(&buf));
     }
 
     let duration = start.elapsed();
 
     println!(
-        "Hashed {} times in {:?} ({:.2} ns per call)",
-        iterations,
+        "Hashed {} varying inputs in {:?} ({:.4} ns per call)",
+        ITERATIONS,
         duration,
-        duration.as_nanos() as f64 / iterations as f64
+        duration.as_nanos() as f64 / ITERATIONS as f64
     );
-
     println!("Accumulator: {:016x}", acc);
 }
