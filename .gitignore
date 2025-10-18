@@ -1,0 +1,9 @@
+# builds
+**/__pycache__/
+**/target/
+
+# perf
+**/perf.*
+
+# local
+**/.local/
