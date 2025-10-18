@@ -1,0 +1,11 @@
+[package]
+name = "caracal"
+version = "0.1.0"
+edition = "2024"
+description = "SIMD optimized 64-bit hash lib built on WyHash."
+license = "Apache-2.0"
+repository = "https://github.com/frozen-lab/caracal"
+readme = "README.md"
+keywords = ["hash", "hasher", "wyhash", "entropy"]
+categories = ["algorithms"]
+exclude = ["flake.nix", "flake.lock"]
