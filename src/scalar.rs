@@ -21,11 +21,18 @@ pub(crate) fn wyhash(buf: &[u8]) -> u64 {
     let mut b;
 
     if buf.len() <= 16 {
+        let mut tmp = [0u8; 8];
+
         if buf.len() >= 4 {
-            a = (u32::from_le_bytes(buf[..4].try_into().unwrap()) as u64) << 32
-                | u32::from_le_bytes(buf[buf.len() - 4..].try_into().unwrap()) as u64;
+            tmp[..4].copy_from_slice(&buf[..4]);
+            let a_high = u32::from_le_bytes(tmp[..4].try_into().unwrap()) as u64;
+
+            tmp[..4].copy_from_slice(&buf[buf.len() - 4..]);
+            let a_low = u32::from_le_bytes(tmp[..4].try_into().unwrap()) as u64;
+
+            a = (a_high << 32) | a_low;
         } else if !buf.is_empty() {
-            a = (buf[0] as u64) << 16 | (buf[buf.len() / 2] as u64) << 8 | *buf.last().unwrap() as u64;
+            a = (buf[0] as u64) << 16 | (buf[buf.len() / 2] as u64) << 8 | buf[buf.len() - 1] as u64;
         } else {
             a = 0;
         }
@@ -38,8 +45,14 @@ pub(crate) fn wyhash(buf: &[u8]) -> u64 {
     let mut d = buf;
 
     while d.len() > 16 {
-        a = u64::from_le_bytes(d[..8].try_into().unwrap());
-        b = u64::from_le_bytes(d[8..16].try_into().unwrap());
+        let mut tmp_a = [0u8; 8];
+        let mut tmp_b = [0u8; 8];
+
+        tmp_a.copy_from_slice(&d[..8]);
+        tmp_b.copy_from_slice(&d[8..16]);
+
+        a = u64::from_le_bytes(tmp_a);
+        b = u64::from_le_bytes(tmp_b);
 
         acc = wymix(a ^ WYP[1], b ^ acc);
         d = &d[16..];
@@ -48,14 +61,16 @@ pub(crate) fn wyhash(buf: &[u8]) -> u64 {
     let mut tail = [0u8; 16];
     tail[..d.len()].copy_from_slice(d);
 
-    a = u64::from_le_bytes(tail[..8].try_into().unwrap());
-    b = u64::from_le_bytes(tail[8..].try_into().unwrap());
+    a = u64::from_le_bytes([tail[0], tail[1], tail[2], tail[3], tail[4], tail[5], tail[6], tail[7]]);
+    b = u64::from_le_bytes([
+        tail[8], tail[9], tail[10], tail[11], tail[12], tail[13], tail[14], tail[15],
+    ]);
 
     wymix(a ^ WYP[2], b ^ acc)
 }
 
 #[test]
-fn wyhash_deterministic() {
+fn test_if_wyhash_is_deterministic() {
     let data = b"caracal";
 
     let h1 = wyhash(data);
