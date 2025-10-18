@@ -9,3 +9,21 @@ readme = "README.md"
 keywords = ["hash", "hasher", "wyhash", "entropy"]
 categories = ["algorithms"]
 exclude = ["flake.nix", "flake.lock"]
+
+[profile.bench]
+lto = "fat"
+codegen-units = 1
+opt-level = "z"
+panic = "abort"
+strip = "symbols"
+
+[profile.profile]
+inherits = "release"
+debug = true
+lto = "off"
+opt-level = 2
+codegen-units = 1
+debug-assertions = false
+overflow-checks = false
+strip = "none"
+
