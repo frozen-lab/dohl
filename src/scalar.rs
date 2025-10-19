@@ -8,24 +8,24 @@
 //!
 //! | Input Size | Time (ns/call) |
 //! |------------|----------------|
-//! | 8 B        | 4.405          |
-//! | 16 B       | 4.148          |
-//! | 32 B       | 4.933          |
-//! | 64 B       | 7.450          |
-//! | 128 B      | 12.467         |
-//! | 256 B      | 23.410         |
-//! | 512 B      | 45.397         |
-//! | 1 KiB      | 95.524         |
-//! | 2 KiB      | 182.261        |
-//! | 4 KiB      | 364.616        |
+//! | 8 B        | 2.765          |
+//! | 16 B       | 2.768          |
+//! | 32 B       | 4.375          |
+//! | 64 B       | 6.850          |
+//! | 128 B      | 12.756         |
+//! | 256 B      | 24.627         |
+//! | 512 B      | 46.501         |
+//! | 1 KiB      | 94.886         |
+//! | 2 KiB      | 177.650        |
+//! | 4 KiB      | 352.293        |
 //!
-//! **Mean:** 74.46 ns/call  
+//! **Mean:** 72.547 ns/call (± 5.0)
 //!
 //! ## Perf Stats
 //!
-//! - ~3.74 IPC (Instructions per cycle)
-//! - ~4.25 GHz effective core clock
-//! - ~0.13% branch mispredicts (~2 branches per hash)
+//! - Instruction throughput: ~3.81 IPC (Instructions per cycle)
+//! - Effective core clock: ~4.22 GHz
+//! - Branch mispredicts: ~0.13% (~2-3 branches per hash)
 //!
 const WYP: [u64; 4] = [
     0xa0761d6478bd642f,
@@ -51,21 +51,18 @@ pub(crate) fn wyhash(buf: &[u8]) -> u64 {
     let mut b;
 
     if buf.len() <= 16 {
-        let mut tmp = [0u8; 8];
-
-        if buf.len() >= 4 {
-            tmp[..4].copy_from_slice(&buf[..4]);
-            let a_high = u32::from_le_bytes(tmp[..4].try_into().unwrap()) as u64;
-
-            tmp[..4].copy_from_slice(&buf[buf.len() - 4..]);
-            let a_low = u32::from_le_bytes(tmp[..4].try_into().unwrap()) as u64;
-
-            a = (a_high << 32) | a_low;
-        } else if !buf.is_empty() {
-            a = (buf[0] as u64) << 16 | (buf[buf.len() / 2] as u64) << 8 | buf[buf.len() - 1] as u64;
-        } else {
-            a = 0;
-        }
+        a = match buf.len() {
+            0 => 0,
+            1..=3 => {
+                let mid = buf.len() / 2;
+                ((buf[0] as u64) << 16) | ((buf[mid] as u64) << 8) | (buf[buf.len() - 1] as u64)
+            }
+            _ => {
+                let a_high = u32::from_le_bytes(buf[..4].try_into().unwrap()) as u64;
+                let a_low = u32::from_le_bytes(buf[buf.len() - 4..].try_into().unwrap()) as u64;
+                (a_high << 32) | a_low
+            }
+        };
 
         b = seed ^ a.rotate_left(23);
         return wymix(a ^ WYP[1], b ^ WYP[3]);
