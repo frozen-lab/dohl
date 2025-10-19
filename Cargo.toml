@@ -10,6 +10,11 @@ keywords = ["hash", "hasher", "wyhash", "entropy"]
 categories = ["algorithms"]
 exclude = ["flake.nix", "flake.lock"]
 
+[[bench]]
+name = "thpt"
+path = "benchmarks/thpt.rs"
+harness = false
+
 [profile.bench]
 lto = "fat"
 codegen-units = 1

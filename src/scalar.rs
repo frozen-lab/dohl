@@ -1,12 +1,31 @@
 //! Scalar impl (as baseline)
 //!
-//! # Perf (Release build)
+//! ## Bench Results
 //!
-//! - ~0.93 ± 0.1 ns per call (10M iterations)
-//! - ~4 CPU cycles per hash
-//! - ~2 branches per hash
-//! - Instruction throughput (IPC ~3.7)
-//! - Branch predictor (nearly perfect) at ~0.02% mispredicts
+//! ```bash
+//! taskset -c 0 perf stat cargo bench --bench thpt --profile bench
+//! ```
+//!
+//! | Input Size | Time (ns/call) |
+//! |------------|----------------|
+//! | 8 B        | 4.405          |
+//! | 16 B       | 4.148          |
+//! | 32 B       | 4.933          |
+//! | 64 B       | 7.450          |
+//! | 128 B      | 12.467         |
+//! | 256 B      | 23.410         |
+//! | 512 B      | 45.397         |
+//! | 1 KiB      | 95.524         |
+//! | 2 KiB      | 182.261        |
+//! | 4 KiB      | 364.616        |
+//!
+//! **Mean:** 74.46 ns/call  
+//!
+//! ## Perf Stats
+//!
+//! - ~3.74 IPC (Instructions per cycle)
+//! - ~4.25 GHz effective core clock
+//! - ~0.13% branch mispredicts (~2 branches per hash)
 //!
 const WYP: [u64; 4] = [
     0xa0761d6478bd642f,
