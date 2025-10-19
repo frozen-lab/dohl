@@ -23,6 +23,7 @@ fn wymix(a: u64, b: u64) -> u64 {
     (r >> 64) as u64 ^ r as u64
 }
 
+#[inline(always)]
 pub(crate) fn wyhash(buf: &[u8]) -> u64 {
     let mut seed = WYP_SEED;
     seed = wymix(seed, WYP[1] ^ buf.len() as u64);
