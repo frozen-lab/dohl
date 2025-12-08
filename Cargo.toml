@@ -1,19 +1,14 @@
 [package]
-name = "caracal"
-version = "0.1.0"
+name = "dohl"
+version = "0.0.1"
 edition = "2024"
 description = "SIMD optimized 64-bit hash lib built on WyHash."
 license = "Apache-2.0"
-repository = "https://github.com/frozen-lab/caracal"
+repository = "https://github.com/frozen-lab/dohl"
 readme = "README.md"
-keywords = ["hash", "hasher", "wyhash", "entropy"]
+keywords = ["hash", "hasher", "xxhash3", "entropy"]
 categories = ["algorithms"]
-exclude = ["flake.nix", "flake.lock"]
-
-[[bench]]
-name = "thpt"
-path = "benchmarks/thpt.rs"
-harness = false
+exclude = ["shell.nix"]
 
 [profile.bench]
 lto = "fat"
